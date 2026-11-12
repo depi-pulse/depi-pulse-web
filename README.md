@@ -49,6 +49,19 @@ Then open http://localhost:8000.
 docker compose up --build
 ```
 
+## Deploy: a fixed link to share
+The project comes ready for **Render** (free):
+1. Sign in at https://render.com with your GitHub account.
+2. Go to **New** → **Blueprint** and pick the `depi-pulse/depi-pulse-web` repo.
+3. Render reads `render.yaml` on its own. Click **Apply** and wait about 5 minutes.
+4. You get a link like `https://depi-pulse.onrender.com`. Send it to the group.
+
+Notes:
+- The free plan **sleeps after 15 minutes** without visitors, and the first visit after that takes about a minute.
+- The fake data is regenerated on every start (`start.sh`).
+- **Railway** also works through `Procfile`, and so does **any Docker host** through the `Dockerfile`.
+- The deploy files are `build.sh`, `start.sh`, `render.yaml`, `Procfile` and `Dockerfile`. The server is gunicorn, and whitenoise serves the CSS/JS.
+
 ## Pages
 | Page | Link | What's in it |
 |---|---|---|

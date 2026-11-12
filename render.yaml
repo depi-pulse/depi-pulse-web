@@ -1,0 +1,21 @@
+# One-click deploy on Render (https://render.com): New → Blueprint → pick this repo.
+# Free plan: the site sleeps after 15 minutes without visitors; the first visit after that takes ~1 minute.
+# Data is FAKE and is regenerated on every start (SQLite inside the container).
+services:
+  - type: web
+    name: depi-pulse
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: ./build.sh
+    startCommand: ./start.sh
+    healthCheckPath: /login
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: "2"
