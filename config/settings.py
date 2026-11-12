@@ -16,9 +16,9 @@ def _env_list(name, default=""):
     return [x.strip() for x in os.environ.get(name, default).split(",") if x.strip()]
 
 
-ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.app.github.dev,.onrender.com,.up.railway.app,.hf.space")
+ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.app.github.dev,.onrender.com,.up.railway.app,.hf.space,.pythonanywhere.com")
 CSRF_TRUSTED_ORIGINS = _env_list(
-    "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.app.github.dev,https://*.onrender.com,https://*.up.railway.app,https://*.hf.space")
+    "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.app.github.dev,https://*.onrender.com,https://*.up.railway.app,https://*.hf.space,https://*.pythonanywhere.com")
 
 # Render / Railway / Hugging Face give the public host name in an env var: trust it automatically.
 for _var in ("RENDER_EXTERNAL_HOSTNAME", "RAILWAY_PUBLIC_DOMAIN", "SPACE_HOST"):

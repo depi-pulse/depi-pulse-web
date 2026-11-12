@@ -8,3 +8,4 @@ staticfiles/
 *.xlsx
 *.csv
 *.dump
+.secret_key
