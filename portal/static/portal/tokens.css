@@ -1,0 +1,69 @@
+/* DEPI — "Delta" design language tokens (prototype). Source of truth until ported to frontend/src/styles.css. */
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800&family=Readex+Pro:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Egyptian Blue — cuprorivaite, the first synthetic pigment (Egypt, c. 2500 BC) */
+  --eb-50: #eef2fc; --eb-100: #d9e1f8; --eb-200: #b3c3f0; --eb-300: #8299e4; --eb-400: #4f6cd3;
+  --eb-500: #2a49b8; --eb-600: #1f3a9e; --eb-700: #182e7e; --eb-800: #13245f; --eb-900: #0d1a44; --eb-950: #080f2a;
+  /* Ochre — the gold/yellow earth pigment of the same palettes; used only for "outcomes" and the one CTA */
+  --ochre-100: #f8ebcf; --ochre-300: #e9c27a; --ochre-400: #dda845; --ochre-500: #c98c26; --ochre-600: #a26d17;
+  /* Semantic */
+  --papyrus: #1e8a5a; --red-ochre: #b8432f; --amber: #c7720f; --slate: #6b7183;
+
+  /* Light — crisp white page, navy bands (inspired by newtecx.com), hairline cards */
+  --bg: #ffffff; --bg-2: #f6f8fc; --surface: #ffffff; --surface-2: #f5f7fb; --surface-3: #eceff6;
+  --line: #e6eaf2; --line-strong: #d3d9e6;
+  --text: #0e1b33; --text-2: #4a5672; --text-3: #8590a8;
+  --primary: #2f55d4; --primary-strong: #1f3fae; --primary-soft: #eef2fd; --on-primary: #fff;
+  --accent: var(--ochre-500); --accent-soft: var(--ochre-100);
+  --success: var(--papyrus); --danger: var(--red-ochre); --warning: var(--amber); --neutral: var(--slate);
+  --focus: 0 0 0 2px var(--surface), 0 0 0 4px #5f7fe6;
+  --shadow-1: 0 1px 2px rgb(14 27 51 / .04);
+  --shadow-2: 0 24px 48px -24px rgb(14 27 51 / .22), 0 4px 12px -4px rgb(14 27 51 / .08);
+  --navy: #0e1b33; --navy-2: #13254a;
+  /* Sidebar — always deep navy, in both themes */
+  --side: #0e1b33; --side-2: #172a52; --side-line: #1e3260; --side-text: #c8d2ec; --side-text-2: #8494c0;
+
+  /* Track colours — the gemstones of Egyptian jewellery (lapis, amethyst, faience, carnelian, malachite, gold, granite, rose quartz) */
+  --tr-swd: #2f4fb5; --tr-ais: #7b57c9; --tr-dat: #0f9aa0; --tr-drt: #c8553d;
+  --tr-iss: #2e8b57; --tr-erp: #c08a2a; --tr-ind: #5e6a82; --tr-gam: #c9577e;
+
+  /* Type */
+  --font-display: 'Alexandria', 'Readex Pro', system-ui, sans-serif;
+  --font-ui: 'Readex Pro', 'Alexandria', system-ui, sans-serif;
+  --fs-cap: 12px; --fs-sm: 13px; --fs-body: 15px; --fs-lg: 17px; --fs-h3: 20px; --fs-h2: 26px; --fs-h1: 34px; --fs-kpi: 44px; --fs-hero: 64px;
+
+  /* Shape & motion: two radii only — 6 for controls, 14 for containers */
+  --r-ctl: 10px; --r-box: 18px; --r-pill: 999px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1); --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --t-fast: 120ms; --t: 200ms; --t-slow: 320ms;
+  --space: 4px;
+}
+
+:root[data-theme="dark"] {
+  /* Nile at night — deep blue, never pure black */
+  --bg: #070c19; --bg-2: #050913; --surface: #0f1629; --surface-2: #141d35; --surface-3: #1a2542;
+  --line: #212c4b; --line-strong: #2e3a60;
+  --text: #e8ecf6; --text-2: #a8b1cc; --text-3: #6f7998;
+  --primary: #7d95ef; --primary-strong: #a9b9f6; --primary-soft: #18244d; --on-primary: #08102a;
+  --accent: var(--ochre-400); --accent-soft: #3a2c10;
+  --success: #43c08a; --danger: #e5775f; --warning: #e6a043; --neutral: #8c93aa;
+  --focus: 0 0 0 2px var(--surface), 0 0 0 4px #7d95ef;
+  --shadow-1: 0 1px 0 rgb(0 0 0 / .35);
+  --shadow-2: 0 20px 44px -18px rgb(0 0 0 / .7);
+  --side: #050a17; --side-2: #0c1530; --side-line: #18234a; --navy: #050a17; --navy-2: #0c1530; --bg-2: #0b1222;
+  --tr-swd: #6f8cf0; --tr-ais: #a387ea; --tr-dat: #34c3c8; --tr-drt: #ec8066;
+  --tr-iss: #5cc28a; --tr-erp: #e0b154; --tr-ind: #93a0bd; --tr-gam: #ec86a8;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.65; text-rendering: optimizeLegibility;
+  font-feature-settings: "tnum" 1; -webkit-font-smoothing: antialiased;
+  transition: background var(--t-slow) var(--ease-out), color var(--t-slow) var(--ease-out);
+}
+:focus-visible { outline: none; box-shadow: var(--focus); border-radius: var(--r-ctl); }
+.num { font-family: var(--font-display); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; } }

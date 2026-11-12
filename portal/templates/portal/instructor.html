@@ -1,0 +1,29 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}{{ i.name_ar }}{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow"><a href="/instructors" style="color:inherit">المحاضرين</a> · ملف المحاضر</span>
+  <h1>{{ i.name_ar }}</h1><p class="sub ltr">{{ i.name_en }}</p></div>
+  <div class="acts">{% if i.code %}<span class="code-badge" style="font-size:16px">{{ i.code }}</span>{% else %}<span class="code-badge none">مفيش كود لسه</span>{% endif %}{% pill i.get_approval_display i.approval %}</div></div>
+{% if i.needs_review %}<div class="banner warn" style="margin-bottom:18px">{% icon 'alert' %}<div><b>محتاج مراجعة:</b> {{ i.review_note }}</div></div>{% endif %}
+<div class="grid">
+  <section class="card c5"><div class="card-h"><div><span class="k">من فورم المحاضرين</span><h3>البيانات</h3></div></div><div class="card-b">
+    <dl class="dl">
+      <dt>الرقم القومي</dt><dd><span id="nid"><span class="masked">{{ i.national_id|mask }}</span><button class="reveal-btn" hx-post="/reveal/instructor/{{ i.pk }}" hx-vals='{"field":"national_id"}' hx-target="#nid" title="كشف (بيتسجل)">{% icon 'eye' %}</button></span></dd>
+      <dt>الموبايل</dt><dd><span class="masked">{{ i.phone|mask }}</span></dd>
+      <dt>الإيميل</dt><dd><span class="masked">{{ i.email|mask:"email" }}</span></dd>
+      <dt>المجال</dt><dd class="ltr">{{ i.fields }}</dd>
+      <dt>الشركات</dt><dd>{% for p in i.providers.all %}<a class="tag" href="/providers/{{ p.code }}">{{ p.code }} · {{ p.name }}</a> {% endfor %}</dd>
+      <dt>المسارات</dt><dd>{% for t in i.tracks.all %}<span class="tag"><i class="sw" style="background:{{ t.color }}"></i>{{ t.name_ar }}</span> {% empty %}—{% endfor %}</dd>
+      <dt>الملفات</dt><dd class="row"><a class="btn sec sm" href="{{ i.cv_link }}" target="_blank" rel="noopener">{% icon 'file' %}السيرة الذاتية</a><a class="btn sec sm" href="{{ i.video_link }}" target="_blank" rel="noopener">{% icon 'play' %}الفيديو</a><a class="btn sec sm" href="{{ i.id_photo_link }}" target="_blank" rel="noopener" title="صورة البطاقة: الكشف بيتسجل">{% icon 'lock' %}صورة البطاقة</a></dd>
+    </dl></div></section>
+  <section class="card c7"><div class="card-h"><div><span class="k">الأداء</span><p class="ins">{{ agg.n|ar }} محاضرة · اتأخر في {{ agg.late|ar }} منهم</p></div></div><div class="card-b">
+    <div class="row" style="gap:26px;margin-bottom:14px">
+      <div><div class="muted" style="font-size:12.5px">التقييم</div><b class="num" style="font-size:26px">{{ i.rating|ar:1 }} ★</b></div>
+      <div><div class="muted" style="font-size:12.5px">مرات التأخير (أكتر من ١٠ د)</div><b class="num" style="font-size:26px">{{ i.late_count|ar }}</b></div>
+      <div><div class="muted" style="font-size:12.5px">المجموعات</div><b class="num" style="font-size:26px">{{ groups|length|ar }}</b></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>المجموعة</th><th>اليوم</th><th>تأخير</th><th>الحالة</th></tr></thead><tbody>
+    {% for l in lectures %}<tr><td><a class="cart" href="/groups/{{ l.group.code }}">{{ l.group.code }}</a></td><td><a href="/attendance/{{ l.pk }}">{{ l.starts_at|date:"D j/n"|ar }}</a></td><td>{{ l.instructor_late_min|ar }} د</td><td>{% pill l.get_status_display l.status %}</td></tr>{% endfor %}
+    </tbody></table></div></div></section>
+</div>
+{% endblock %}

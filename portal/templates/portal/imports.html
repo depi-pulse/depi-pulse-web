@@ -1,0 +1,24 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}استيراد الإكسل{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">بيانات الطلبة من البوابة الرئيسية</span><h1>استيراد الإكسل</h1>
+  <p class="sub">ارفع ملف الإكسل اللي نازل من بوابة DEPI. الموقع بيتحقق منه الأول، ويوريك اللي هيتضاف ويتعدّل قبل ما تأكّد، والتعديلات اليدوية عمرها ما بتتمسح.</p></div></div>
+<div class="stepper" style="margin-bottom:22px"><div class="st {% if preview %}done{% else %}on{% endif %}"><b>١</b><span>رفع الملف</span></div><div class="st {% if preview %}on{% endif %}"><b>٢</b><span>التحقق والفروقات</span></div><div class="st"><b>٣</b><span>تأكيد ودمج</span></div></div>
+<div class="grid">
+  <section class="card c5"><div class="card-b">
+    <form method="post" enctype="multipart/form-data" class="stack" style="gap:14px">{% csrf_token %}
+      <label class="dropzone" style="display:block">{% icon 'upload' %}<h4 style="margin:8px 0 4px;font-family:var(--font-display)">اختار ملف .xlsx</h4><p class="muted" style="margin:0;font-size:13px">ملف المتقدمين أو المجموعات أو المواعيد أو المحاضرين</p>
+        <input type="file" name="file" accept=".xlsx,.xls" required style="margin-top:12px"></label>
+      {% if preview %}
+        <div class="banner info">{% icon 'file' %}<div><b>{{ preview.name }}</b> · {{ preview.rows|ar }} صف<br>هيتضاف {{ preview.new|ar }} · هيتعدّل {{ preview.upd|ar }} · من غير تغيير {{ preview.same|ar }} · ملاحظات جودة {{ preview.issues|ar }}</div></div>
+        <input type="hidden" name="confirm" value="1"><p class="muted" style="margin:0;font-size:13px">اختار نفس الملف تاني واضغط تأكيد علشان يتدمج.</p>
+        <button class="btn pri" type="submit">{% icon 'check' %}تأكيد ودمج</button>
+      {% else %}<button class="btn pri" type="submit">{% icon 'upload' %}ارفع واتحقق</button>{% endif %}
+    </form></div></section>
+  <section class="card c7"><div class="card-h"><div><span class="k">السجل</span><h3>الدفعات اللي اترفعت</h3></div></div><div class="card-b tbl-wrap">
+    <table class="tbl"><thead><tr><th>الملف</th><th>النوع</th><th>الصفوف</th><th>جديد</th><th>اتعدّل</th><th>ملاحظات</th><th>امتى</th></tr></thead><tbody>
+    {% for b in batches %}<tr><td class="ltr" style="font-size:13px">{{ b.file_name }}</td><td>{{ b.kind }}</td><td class="n">{{ b.rows|ar }}</td><td class="n">{{ b.inserted|ar }}</td><td class="n">{{ b.updated|ar }}</td>
+      <td>{% if b.issues %}<span class="sla warn">{{ b.issues|ar }}</span>{% else %}<span class="sla ok">٠</span>{% endif %}</td><td class="muted" style="font-size:12.5px">من {{ b.created_at|timesince|ar }}</td></tr>{% endfor %}
+    </tbody></table></div></section>
+</div>
+{% endblock %}

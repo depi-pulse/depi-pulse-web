@@ -1,0 +1,23 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}محتاج تدخّل{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">التنبيهات</span><h1>محتاج تدخّل</h1>
+  <p class="sub">التنبيهات بتتحسب أوتوماتيك من كل البيانات اللي وصلت: الإكسل، والواتساب، والفورمز، وحضور Teams. الأهم فوق.</p></div></div>
+<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:22px">
+  <div class="kpi"><span class="l">حرجة</span><div class="v num" style="color:var(--danger)">{{ counts.crit|default:0|ar }}</div></div>
+  <div class="kpi"><span class="l">تحذير</span><div class="v num" style="color:var(--warning)">{{ counts.warn|default:0|ar }}</div></div>
+  <div class="kpi"><span class="l">للعلم</span><div class="v num">{{ counts.info|default:0|ar }}</div></div>
+</div>
+<div class="stack">
+{% for sev, title, count, href, ic in rows %}
+  <section class="card" style="border-inline-start:4px solid var(--{% if sev == 'crit' %}danger{% elif sev == 'warn' %}warning{% else %}primary{% endif %})">
+    <div class="row" style="padding:16px 20px;gap:16px">
+      <span class="icon-sq" style="width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--surface-2)">{% icon ic %}</span>
+      <div style="flex:1;min-width:200px">{% if sev == 'crit' %}{% pill 'حرج' 'err' %}{% elif sev == 'warn' %}{% pill 'تحذير' 'wait' %}{% else %}{% pill 'للعلم' 'info' %}{% endif %} <b style="font-size:16px">{{ title }}</b></div>
+      <b class="num" style="font-size:28px">{{ count|ar }}</b><a class="btn pri sm" href="{{ href }}">افتح القايمة</a>
+    </div>
+  </section>
+{% empty %}<div class="card"><div class="empty"><h4>مفيش حاجة محتاجة تدخّل</h4><p>كل حاجة ماشية تمام.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

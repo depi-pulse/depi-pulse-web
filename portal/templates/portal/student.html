@@ -1,0 +1,40 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}{{ s.name_ar }}{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow"><a href="/students" style="color:inherit">الطلبة</a> · ملف الطالب ٣٦٠°</span>
+  <h1>{{ s.name_ar }}</h1><p class="sub ltr">{{ s.name_en }}</p></div>
+  <div class="acts">{% pill s.get_status_display s.status %}{% if s.warning_level == 3 %}{% pill 'توصية بالفصل' 'err' %}{% elif s.warning_level == 2 %}{% pill 'إنذار تاني' 'wait' %}{% elif s.warning_level == 1 %}{% pill 'إنذار أول' 'wait' %}{% endif %}</div></div>
+<div class="grid">
+  <section class="card c5"><div class="card-h"><div><span class="k">البيانات</span><h3>من بوابة التسجيل</h3></div></div><div class="card-b">
+    <dl class="dl">
+      <dt>الرقم القومي</dt><dd><span id="nid"><span class="masked">{{ s.national_id|mask }}</span><button class="reveal-btn" hx-post="/reveal/student/{{ s.pk }}" hx-vals='{"field":"national_id"}' hx-target="#nid" title="كشف (بيتسجل في سجل العمليات)">{% icon 'eye' %}</button></span></dd>
+      <dt>الموبايل</dt><dd><span id="ph"><span class="masked">{{ s.phone|mask }}</span><button class="reveal-btn" hx-post="/reveal/student/{{ s.pk }}" hx-vals='{"field":"phone"}' hx-target="#ph">{% icon 'eye' %}</button></span></dd>
+      <dt>الإيميل</dt><dd><span class="masked">{{ s.email|mask:"email" }}</span></dd>
+      <dt>النوع</dt><dd>{{ s.get_gender_display }}</dd>
+      <dt>المحافظة</dt><dd>{{ s.governorate }}</dd>
+      <dt>الجامعة</dt><dd>{{ s.university }} · {% if s.is_graduate %}خريج{% else %}طالب{% endif %}</dd>
+      <dt>المسار</dt><dd><span class="tag"><i class="sw" style="background:{{ s.track.color }}"></i>{{ s.track.name_ar }}</span></dd>
+      <dt>تاريخ التسجيل</dt><dd>{{ s.registered_at|date:"j F Y"|ar }}</dd>
+    </dl></div></section>
+  <section class="card c7"><div class="card-h"><div><span class="k">الحضور</span><p class="ins">نسبة الغياب {{ s.absence_rate|ar:1 }}٪ من {{ s.lectures|ar }} محاضرة</p></div></div><div class="card-b stack" style="gap:14px">
+    {% if s.lectures %}
+    <div class="row" style="gap:22px">
+      <div><div class="muted" style="font-size:12.5px">حاضر</div><b class="num" style="font-size:24px;color:var(--success)">{{ s.present|ar }}</b></div>
+      <div><div class="muted" style="font-size:12.5px">جزئي</div><b class="num" style="font-size:24px;color:var(--warning)">{{ s.partial|ar }}</b></div>
+      <div><div class="muted" style="font-size:12.5px">غائب</div><b class="num" style="font-size:24px;color:var(--danger)">{{ s.absent|ar }}</b></div>
+      <div><div class="muted" style="font-size:12.5px">بعذر</div><b class="num" style="font-size:24px">{{ s.excused|ar }}</b></div>
+      <div><div class="muted" style="font-size:12.5px">متأخر</div><b class="num" style="font-size:24px">{{ s.late|ar }}</b></div>
+    </div>
+    <div class="lec-dots" aria-label="المحاضرات بالترتيب">{% for x in timeline %}<i class="{{ x }}" title="{{ x }}"></i>{% endfor %}</div>
+    <div class="banner info">{% icon 'info' %}<div>سياسة الحضور: حاضر لو حضر {{ rule.present_min_percent|ar }}٪ أو أكتر، جزئي من {{ rule.partial_min_percent|ar }}٪، والإنذارات عند {{ rule.warning1_percent|ar }}٪ و{{ rule.warning2_percent|ar }}٪ غياب، وتوصية بالفصل فوق {{ rule.dismissal_percent|ar }}٪.</div></div>
+    {% else %}<p class="muted">الطالب مش متسكن في مجموعة.</p>{% endif %}
+  </div></section>
+  {% if s.group %}
+  <section class="card c6"><div class="card-h"><div><span class="k">المجموعة</span><h3><a class="cart" href="/groups/{{ s.group.code }}">{{ s.group.code }}</a></h3></div></div><div class="card-b">
+    <dl class="dl"><dt>الشركة</dt><dd><a href="/providers/{{ s.group.provider.code }}">{{ s.group.provider.name }}</a></dd><dt>الوظيفة</dt><dd class="ltr">{{ s.group.profile }}</dd><dt>الميعاد</dt><dd>{{ s.group.schedule }}</dd></dl></div></section>
+  <section class="card c6"><div class="card-h"><div><span class="k">مشروع التخرج</span><h3>{% if team %}{{ team.idea }}{% else %}لسه مسجلش{% endif %}</h3></div></div><div class="card-b">
+    {% if team %}<dl class="dl"><dt>الفريق</dt><dd>{{ team.name }} · {{ team.members|ar }} أعضاء</dd><dt>GitHub</dt><dd><a class="ltr" href="{{ team.github }}" target="_blank" rel="noopener">{{ team.github }}</a></dd>
+      <dt>التقييم</dt><dd>{% if team.assessment %}<b class="score">{{ team.assessment.total|ar:1 }}</b>{% else %}لسه{% endif %}</dd></dl>{% else %}<p class="muted">فورم مشروع التخرج بيملاه قائد الفريق.</p>{% endif %}</div></section>
+  {% endif %}
+</div>
+{% endblock %}

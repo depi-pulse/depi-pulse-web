@@ -1,0 +1,54 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}نظرة عامة{% endblock %}
+{% block content %}
+<div class="ph">
+  <div><span class="eyebrow">الراوند الخامس · {{ now|date:"l j F"|ar }}</span>
+    <h1>من كل ١٠٠ متقدم، <span style="color:var(--primary)">{{ accepted|percent_of:total|ar }}</span> اتقبلوا.</h1>
+    <p class="sub">{{ total|ar }} متقدم، و{{ accepted|ar }} طالب بيتدربوا دلوقتي في {{ kpis.2.1|ar }} مجموعة. أكبر مسار هو «{{ top_track.name_ar }}».</p></div>
+  <div class="acts"><a class="btn sec" href="/alerts">{% icon 'alert' %}محتاج تدخّل</a><a class="btn pri" href="/inbox">{% icon 'whatsapp' %}صندوق الواتساب</a></div>
+</div>
+
+<div class="kpis k8" style="margin-bottom:22px">
+  {% for l, v, unit, href, s in kpis %}
+  <a class="kpi" href="{{ href }}"><span class="l">{{ l }}</span><div class="v num">{{ v|ar }}{% if unit %}<small>{{ unit }}</small>{% endif %}</div><div class="ft"><span class="s">{{ s|ar }}</span></div></a>
+  {% endfor %}
+</div>
+
+<div class="card" style="margin-bottom:22px"><div class="card-b" style="padding:12px 18px">
+  <div class="row" style="gap:18px">
+    <b style="font-size:13.5px">آخر بيانات وصلت</b>
+    {% for name, at, ic in feeds %}<span class="row muted" style="gap:6px;font-size:13px">{% icon ic %}{{ name }}: من {{ at|timesince|ar }}</span>{% endfor %}
+  </div>
+</div></div>
+
+<div class="grid">
+  <section class="card c7"><div class="card-h"><div><span class="k">قمع المتقدمين</span><p class="ins">حالة كل المتقدمين في الراوند</p></div></div>
+    <div class="card-b"><div class="chart" data-chart="c-funnel"></div></div></section>
+  <section class="card c5"><div class="card-h"><div><span class="k">محتاج تدخّل</span><p class="ins">أهم ٥ حاجات النهاردة</p></div><div class="tools"><a class="btn ghost sm" href="/alerts">الكل</a></div></div>
+    <div class="card-b stack" style="gap:10px">
+      {% for sev, title, count, href, ic in alerts %}
+      <a class="row" href="{{ href }}" style="text-decoration:none;color:inherit;padding:8px 0;border-bottom:1px solid var(--line)">
+        <span class="icon-sq" style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in oklab, var(--{% if sev == 'crit' %}danger{% elif sev == 'warn' %}warning{% else %}primary{% endif %}) 13%, transparent);color:var(--{% if sev == 'crit' %}danger{% elif sev == 'warn' %}warning{% else %}primary{% endif %})">{% icon ic %}</span>
+        <span style="flex:1">{{ title }}</span><b class="num" style="font-size:20px">{{ count|ar }}</b></a>
+      {% endfor %}
+    </div></section>
+
+  <section class="card c7"><div class="card-h"><div><span class="k">المسارات</span><p class="ins">المتقدمين والمقبولين في كل مسار</p></div></div>
+    <div class="card-b"><div class="chart lg" data-chart="c-tracks"></div></div></section>
+  <section class="card c5"><div class="card-h"><div><span class="k">الجغرافيا</span><p class="ins">أكتر ١٢ محافظة في التقديم</p></div></div>
+    <div class="card-b"><div class="chart lg" data-chart="c-govs"></div></div></section>
+
+  <section class="card c6"><div class="card-h"><div><span class="k">التسجيل</span><p class="ins">التقديمات كل أسبوع</p></div></div>
+    <div class="card-b"><div class="chart sm" data-chart="c-reg"></div></div></section>
+  <section class="card c6"><div class="card-h"><div><span class="k">الواتساب</span><p class="ins">الشكاوى والطلبات كل أسبوع</p></div></div>
+    <div class="card-b"><div class="chart sm" data-chart="c-tk"></div></div></section>
+
+  <section class="card c12"><div class="card-h"><div><span class="k">الشركات التقنية</span><p class="ins">ترتيب الشركات حسب عدد الطلبة</p></div><div class="tools"><a class="btn ghost sm" href="/providers">كل الشركات</a></div></div>
+    <div class="card-b tbl-wrap"><table class="tbl"><thead><tr><th>الشركة</th><th>المجموعات</th><th>الطلبة</th><th>التقييم</th><th>ربط Teams</th></tr></thead><tbody>
+      {% for p in providers %}<tr><td><a class="who-cell" href="/providers/{{ p.code }}" style="text-decoration:none;color:inherit"><span class="logo-tile" style="background:{{ p.color }};width:34px;height:34px;font-size:10px">{{ p.code }}</span><b>{{ p.name }}</b></a></td>
+        <td class="n">{{ p.n_groups|ar }}</td><td class="n">{{ p.students|ar }}</td><td class="n">{{ p.rating|ar:1 }} ★</td>
+        <td>{% if p.teams_status == 'active' %}{% pill 'شغال' 'ok' %}{% elif p.teams_status == 'failing' %}{% pill 'فيه مشكلة' 'err' %}{% else %}{% pill 'مستني موافقة IT' 'wait' %}{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div></section>
+</div>
+{{ charts.funnel|json_script:"c-funnel" }}{{ charts.tracks|json_script:"c-tracks" }}{{ charts.govs|json_script:"c-govs" }}{{ charts.reg|json_script:"c-reg" }}{{ charts.tk|json_script:"c-tk" }}
+{% endblock %}

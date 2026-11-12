@@ -1,0 +1,60 @@
+{% load static depi %}<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}نظرة عامة{% endblock %} · DEPI Pulse</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1533'/%3E%3Cpath d='M16 5v8M16 13c0 5-6 8-9 13M16 13c0 5 6 8 9 13' fill='none' stroke='%238fa6f2' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M7 26h18' stroke='%23dda845' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="{% static 'portal/tokens.css' %}">
+<link rel="stylesheet" href="{% static 'portal/app.css' %}">
+<link rel="stylesheet" href="{% static 'portal/extra.css' %}">
+<script>try { const t = localStorage.getItem('dp-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js" defer></script>
+<script src="{% static 'portal/app.js' %}" defer></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div class="shell" id="shell" x-data="{ open: false }">
+  <aside class="side" id="side" :class="open && 'open'">
+    <a class="brand" href="/">{% logo 34 %}<div><b>DEPI Pulse</b><small>مبادرة رواد مصر الرقمية</small></div></a>
+    <nav aria-label="القائمة الرئيسية">
+      {% for sec, items in NAV %}
+        <div class="nav-sec">{{ sec }}</div>
+        {% for key, href, label, ic in items %}
+          <a class="nav-a {% if active == key or active == '' and key == 'overview' %}on{% endif %}" href="{{ href }}">{% icon ic %}<span>{{ label }}</span>
+            {% if key == 'tickets' and badge_breached %}<span class="cnt hot" title="شكاوى عدّت الـ SLA">{{ badge_breached|ar }}</span>{% endif %}
+            {% if key == 'inbox' and badge_inbox %}<span class="cnt">{{ badge_inbox|ar }}</span>{% endif %}
+          </a>
+        {% endfor %}
+      {% endfor %}
+    </nav>
+    <div class="side-foot">
+      <div class="who"><span class="av sm" style="background:#c08a2a">م</span><div><b>{{ user_name }}</b><small>وزارة الاتصالات · حساب Microsoft</small></div></div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div class="top-row">
+        <button class="icon-btn mob-only" @click="open = !open" aria-label="القائمة">{% icon 'menu' %}</button>
+        <form class="search" action="/students" method="get" role="search">{% icon 'search' %}<input name="q" placeholder="ابحث عن طالب بالاسم أو الرقم القومي أو كود المجموعة" aria-label="بحث" style="border:0;background:transparent;font:inherit;color:inherit;outline:none;flex:1;min-width:0"><input type="hidden" name="status" value=""></form>
+        <div class="top-actions">
+          <a class="fresh" href="/settings" title="حالة الربط مع واتساب والفورمز و Teams"><i></i>واتساب والفورمز و Teams متصلين</a>
+          <button class="icon-btn" type="button" onclick="DP.toggleTheme()" aria-label="الوضع الليلي">{% icon 'moon' %}</button>
+          <a class="icon-btn" href="/alerts" aria-label="محتاج تدخّل">{% icon 'bell' %}{% if badge_breached %}<span class="dot"></span>{% endif %}</a>
+          <a class="icon-btn" href="/logout" title="تسجيل الخروج">{% icon 'logout' %}</a>
+        </div>
+      </div>
+    </header>
+    <div id="view">
+      <div class="page">
+        {% if messages %}<div class="stack" style="margin-bottom:18px">{% for m in messages %}<div class="banner {% if m.tags == 'error' %}err{% else %}ok{% endif %}">{% icon 'check' %}<div>{{ m }}</div></div>{% endfor %}</div>{% endif %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-tag" title="كل البيانات هنا وهمية للعرض">نموذج أولي · بيانات وهمية</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

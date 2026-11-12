@@ -1,0 +1,34 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}{{ g.code }}{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow"><a href="/groups" style="color:inherit">المجموعات</a> · {{ g.get_mode_display }}</span>
+  <h1><span class="cart lg" title="المحافظة · الراوند · المسار والوظيفة · الفئة والرقم"><span>{{ d.parts.0 }}</span><span>{{ d.parts.1 }}</span>_<span>{{ d.parts.2 }}</span>_<span>{{ d.parts.3 }}</span></span></h1></div>
+  <div class="acts">{% with f=g.fill_status %}{% pill f.0 f.1 %}{% endwith %}{% if not g.teams_link_ok %}{% pill 'رابط Teams مش متسجل' 'err' %}{% endif %}</div></div>
+<div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:22px">
+  <div class="kpi"><span class="l">المحافظة والراوند</span><div class="v" style="font-size:22px;font-family:var(--font-display)">{{ d.gov }} · الراوند {{ d.round|ar }}</div></div>
+  <div class="kpi"><span class="l">المسار</span><div class="v" style="font-size:20px;font-family:var(--font-display)">{{ d.track }}</div><div class="ft"><span class="s ltr">{{ d.profile }}</span></div></div>
+  <div class="kpi"><span class="l">الفئة</span><div class="v" style="font-size:22px;font-family:var(--font-display)">{{ d.audience }} · مجموعة {{ d.serial|ar }}</div></div>
+  <div class="kpi"><span class="l">الطلبة</span><div class="v num">{{ n|ar }}<small>/{{ g.capacity|ar }}</small></div><div class="ft"><span class="s">{{ g.schedule }}</span></div></div>
+</div>
+<div class="grid">
+  <section class="card c5"><div class="card-h"><div><span class="k">الشركات والمحاضرين</span><h3>مين بيدرّس المجموعة</h3></div></div><div class="card-b">
+    <dl class="dl">
+      <dt>تقني</dt><dd><a href="/providers/{{ g.provider.code }}">{{ g.provider.code }}</a> · {% if g.technical_instructor %}<a href="/instructors/{{ g.technical_instructor.pk }}">{{ g.technical_instructor }}</a>{% endif %}</dd>
+      <dt>مهارات شخصية</dt><dd><a href="/providers/{{ g.soft_provider.code }}">{{ g.soft_provider.code }}</a> · {% if g.soft_instructor %}<a href="/instructors/{{ g.soft_instructor.pk }}">{{ g.soft_instructor }}</a>{% endif %}</dd>
+      <dt>إنجليزي</dt><dd><a href="/providers/{{ g.english_provider.code }}">{{ g.english_provider.code }}</a> · {% if g.english_instructor %}<a href="/instructors/{{ g.english_instructor.pk }}">{{ g.english_instructor }}</a>{% else %}<span style="color:var(--danger)">مفيش محاضر إنجليزي</span>{% endif %}</dd>
+    </dl></div></section>
+  <section class="card c7"><div class="card-h"><div><span class="k">آخر أسبوعين</span><h3>المحاضرات</h3></div></div><div class="card-b tbl-wrap">
+    <table class="tbl"><thead><tr><th>اليوم</th><th>النوع</th><th>تأخير المحاضر</th><th>الحضور</th><th>الحالة</th></tr></thead><tbody>
+    {% for l in lectures %}<tr><td><a href="/attendance/{{ l.pk }}">{{ l.starts_at|date:"D j/n"|ar }}</a></td><td>{{ l.get_component_display }}</td>
+      <td>{% if l.instructor_late_min > 10 %}<span class="sla bad">{{ l.instructor_late_min|ar }} د</span>{% else %}<span class="muted">{{ l.instructor_late_min|ar }} د</span>{% endif %}</td>
+      <td>{% if l.has_report %}{{ l.attendance_rate|ar }}٪{% else %}{% pill 'تقرير ناقص' 'err' %}{% endif %}</td><td>{% pill l.get_status_display l.status %}</td></tr>{% endfor %}
+    </tbody></table></div></section>
+  <section class="card c8"><div class="card-h"><div><span class="k">الطلبة</span><h3>{{ n|ar }} طالب</h3></div></div><div class="card-b tbl-wrap" style="max-height:460px">
+    <table class="tbl"><thead><tr><th>الطالب</th><th>الغياب</th><th>متأخر</th></tr></thead><tbody>
+    {% for s in students %}<tr><td><a href="/students/{{ s.pk }}">{{ s.name_ar }}</a></td><td>{% with r=s.absence_rate %}<span class="sla {% if r > 25 %}bad{% elif r >= 10 %}warn{% else %}ok{% endif %}">{{ r|ar:1 }}٪</span>{% endwith %}</td><td>{{ s.late|ar }}</td></tr>{% endfor %}
+    </tbody></table></div></section>
+  <section class="card c4"><div class="card-h"><div><span class="k">مشاريع التخرج</span><h3>{{ teams|length|ar }} فريق</h3></div></div><div class="card-b stack" style="gap:10px">
+    {% for t in teams %}<div><b>{{ t.idea }}</b><div class="muted" style="font-size:13px">{{ t.name }} · {{ t.members|ar }} أعضاء · {% if t.assessment %}الإجمالي <b class="score">{{ t.assessment.total|ar:1 }}</b>{% else %}لسه متقيّمش{% endif %}</div></div>
+    {% empty %}<p class="muted">لسه مفيش فرق متسجلة.</p>{% endfor %}</div></section>
+</div>
+{% endblock %}

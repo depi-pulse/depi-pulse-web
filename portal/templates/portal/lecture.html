@@ -1,0 +1,19 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}محاضرة {{ lec.group.code }}{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow"><a href="/attendance" style="color:inherit">الحضور</a> · {{ lec.get_component_display }}</span>
+  <h1><a class="cart lg" href="/groups/{{ lec.group.code }}">{{ lec.group.code }}</a></h1>
+  <p class="sub">{{ lec.starts_at|date:"l j F · H:i"|ar }} · المحاضر: {% if lec.instructor %}<a href="/instructors/{{ lec.instructor.pk }}">{{ lec.instructor }}</a>{% endif %} · بدأ متأخر {{ lec.instructor_late_min|ar }} دقيقة</p></div>
+  <div class="acts">{% pill lec.get_status_display lec.status %}</div></div>
+{% if lec.status == 'not_held' %}<div class="banner err" style="margin-bottom:18px">{% icon 'alert' %}<div>المحاضر اتأخر {{ lec.instructor_late_min|ar }} دقيقة، فالمحاضرة اتحسبت <b>متعملتش</b>، والشركة لازم تعمل محاضرة تعويضية خلال {{ rule.makeup_within_days|ar }} أيام.</div></div>{% endif %}
+{% if not lec.has_report %}<div class="banner warn" style="margin-bottom:18px">{% icon 'file' %}<div>تقرير الحضور موصلش من Teams. الموقع بيسجلها على الشركة كـ «تقرير ناقص»، والشركة ممكن تبعت ملف CSV كبديل.</div></div>{% endif %}
+<section class="card"><div class="card-h"><div><span class="k">من تقرير Teams</span><p class="ins">الخط الزمني لكل طالب (مدة المحاضرة {{ lec.duration_min|ar }} دقيقة)</p></div></div>
+  <div class="card-b tbl-wrap"><table class="tbl"><thead><tr><th>الطالب</th><th>الدخول</th><th style="min-width:200px">الخط الزمني</th><th>الدقايق</th><th>النسبة</th><th>الحالة</th></tr></thead><tbody>
+  {% for r in rows %}<tr><td><a href="/students/{{ r.s.pk }}">{{ r.s.name_ar }}</a></td>
+    <td>{% if r.join is None %}<span class="muted">مدخلش</span>{% else %}+{{ r.join|ar }} د {% if r.late %}<span class="sla warn">متأخر</span>{% endif %}{% endif %}</td>
+    <td><div class="bar-tl"><i style="inset-inline-start:{{ r.seg.0 }}%;width:{{ r.seg.1 }}%;background:{% if r.status == 'present' %}var(--success){% elif r.status == 'partial' %}var(--warning){% else %}var(--danger){% endif %}"></i></div></td>
+    <td>{{ r.minutes|ar }}</td><td>{{ r.pct|ar }}٪</td>
+    <td>{% if r.status == 'present' %}{% pill 'حاضر' 'ok' %}{% elif r.status == 'partial' %}{% pill 'حضور جزئي' 'wait' %}{% else %}{% pill 'غائب' 'err' %}{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6"><div class="empty"><h4>مفيش طلبة</h4></div></td></tr>{% endfor %}
+  </tbody></table></div></section>
+{% endblock %}

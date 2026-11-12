@@ -1,0 +1,13 @@
+{% load depi %}<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الطالب</th><th>الرقم القومي</th><th>المسار</th><th>المجموعة</th><th>الحالة</th><th>الغياب</th></tr></thead><tbody>
+{% for s in page %}<tr>
+  <td><a class="who-cell" href="/students/{{ s.pk }}" style="text-decoration:none;color:inherit"><span class="av" style="background:{{ s.track.color }}">{{ s.name_ar|slice:":1" }}</span><div><b>{{ s.name_ar }}</b><small>{{ s.name_en }}</small></div></a></td>
+  <td><span class="masked">{{ s.national_id|mask }}</span></td>
+  <td><span class="tag"><i class="sw" style="background:{{ s.track.color }}"></i>{{ s.track.name_ar }}</span></td>
+  <td>{% if s.group %}<a class="cart" href="/groups/{{ s.group.code }}">{{ s.group.code }}</a>{% else %}<span class="muted">—</span>{% endif %}</td>
+  <td>{% pill s.get_status_display s.status %}</td>
+  <td>{% if s.lectures %}{% with r=s.absence_rate %}<span class="sla {% if r > 25 %}bad{% elif r >= 10 %}warn{% else %}ok{% endif %}">{{ r|ar:1 }}٪</span>{% endwith %}{% else %}<span class="muted">—</span>{% endif %}</td>
+</tr>{% empty %}<tr><td colspan="6"><div class="empty"><h4>مفيش نتائج</h4><p>جرّب الرقم القومي كامل أو جزء من الاسم.</p></div></td></tr>{% endfor %}
+</tbody></table></div>
+<div class="pagi"><span>{{ total|ar }} نتيجة · صفحة {{ page.number|ar }} من {{ page.paginator.num_pages|ar }}</span>
+  <span class="row">{% if page.has_previous %}<a href="?{% if q %}q={{ q|urlencode }}&{% endif %}status={{ status }}&track={{ track }}&risk={{ risk }}&page={{ page.previous_page_number }}">السابقة</a>{% endif %}
+  {% if page.has_next %}<a href="?{% if q %}q={{ q|urlencode }}&{% endif %}status={{ status }}&track={{ track }}&risk={{ risk }}&page={{ page.next_page_number }}">التالية</a>{% endif %}</span></div>

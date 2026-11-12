@@ -1,0 +1,12 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}المجموعات{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">المجموعات</span><h1>المجموعات</h1>
+  <p class="sub">كل مجموعة ليها كود بيتقري: المحافظة + الراوند، والمسار + رقم الوظيفة، وطلبة (S) أو خريجين (G) + رقم المجموعة. مثال: <span class="cart">CAI5_SWD5_S2</span></p></div></div>
+<form class="filters" hx-get="/groups" hx-target="#tbl" hx-trigger="input changed delay:350ms from:input, change from:select" hx-push-url="true">
+  <input class="inp" name="q" value="{{ q }}" placeholder="كود المجموعة…">
+  <select name="track"><option value="">كل المسارات</option>{% for t in tracks %}<option value="{{ t.code }}" {% if t.code == track %}selected{% endif %}>{{ t.name_ar }}</option>{% endfor %}</select>
+  <select name="status"><option value="">كل المجموعات</option><option value="over" {% if status == 'over' %}selected{% endif %}>أكبر من طاقتها</option><option value="small" {% if status == 'small' %}selected{% endif %}>أقل من ١٥ طالب</option></select>
+</form>
+<section class="card" id="tbl">{% include "portal/partials/groups_table.html" %}</section>
+{% endblock %}

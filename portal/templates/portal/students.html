@@ -1,0 +1,14 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}الطلبة{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">الطلبة والمتقدمين</span><h1>الطلبة</h1>
+  <p class="sub">البيانات جاية من إكسل بوابة DEPI. الرقم القومي والموبايل مخفيين، وأي كشف بيتسجل في سجل العمليات. نسبة الغياب محسوبة بسياسة الحضور: الحضور الجزئي = نص غياب.</p></div>
+  <div class="acts"><a class="btn sec" href="/imports">{% icon 'upload' %}رفع إكسل جديد</a></div></div>
+<form class="filters" hx-get="/students" hx-target="#tbl" hx-trigger="input changed delay:350ms from:input, change from:select" hx-push-url="true">
+  <input class="inp" name="q" value="{{ q }}" placeholder="اسم، رقم قومي كامل، أو كود مجموعة…">
+  <select name="status"><option value="">كل الحالات</option>{% for k, l in statuses %}<option value="{{ k }}" {% if k == status %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select name="track"><option value="">كل المسارات</option>{% for t in tracks %}<option value="{{ t.code }}" {% if t.code == track %}selected{% endif %}>{{ t.name_ar }}</option>{% endfor %}</select>
+  <select name="risk"><option value="">كل الطلبة</option><option value="1" {% if risk == '1' %}selected{% endif %}>غياب ١٠٪+ (إنذار أول)</option><option value="2" {% if risk == '2' %}selected{% endif %}>غياب ٢٠٪+ (إنذار تاني)</option></select>
+</form>
+<section class="card" id="tbl">{% include "portal/partials/students_table.html" %}</section>
+{% endblock %}

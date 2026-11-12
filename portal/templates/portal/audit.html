@@ -1,0 +1,10 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}سجل العمليات{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">الأمان</span><h1>سجل العمليات</h1>
+  <p class="sub">كل عملية بتتسجل هنا: الدخول، وكشف البيانات الشخصية، والردود على الواتساب، وتغيير الحالات، والاستيراد. السجل إضافة بس، مفيش تعديل ولا مسح.</p></div></div>
+<section class="card"><div class="card-b tbl-wrap"><table class="tbl"><thead><tr><th>الوقت</th><th>العملية</th><th>الكيان</th><th>التفاصيل</th><th>المستخدم</th></tr></thead><tbody>
+{% for a in page %}<tr><td class="muted" style="font-size:13px">{{ a.at|date:"j/n · H:i"|ar }}</td><td>{% if a.action == 'كشف بيانات شخصية' %}{% pill a.action 'err' %}{% else %}{% pill a.action 'info' %}{% endif %}</td><td>{{ a.entity }}</td><td>{{ a.detail }}</td><td>{{ user_name }}</td></tr>{% endfor %}
+</tbody></table></div>
+<div class="pagi"><span>صفحة {{ page.number|ar }} من {{ page.paginator.num_pages|ar }}</span><span class="row">{% if page.has_previous %}<a href="?page={{ page.previous_page_number }}">السابقة</a>{% endif %}{% if page.has_next %}<a href="?page={{ page.next_page_number }}">التالية</a>{% endif %}</span></div></section>
+{% endblock %}

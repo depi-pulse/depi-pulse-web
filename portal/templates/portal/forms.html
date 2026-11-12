@@ -1,0 +1,23 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}الفورمز{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">Google Forms → Google Sheets → n8n → الموقع</span><h1>الفورمز</h1>
+  <p class="sub">الوزارة بتعمل الفورمز، ولما شركة تطلب فورم بيتبعتلها اللينك من صندوق الواتساب. كل رد بيتحقق منه ويدخل قاعدة البيانات أوتوماتيك.</p></div></div>
+<div class="tabs">{% for k, l in kinds %}<a href="?kind={{ k }}" class="{% if k == kind %}on{% endif %}">{{ l }} <span class="pill">{{ counts|get:k|ar }}</span></a>{% endfor %}</div>
+<div class="grid">
+  <section class="card c4"><div class="card-h"><div><span class="k">الفورم</span><h3>{{ links|get:kind|first }}</h3></div></div><div class="card-b stack" style="gap:12px">
+    <div class="row"><input class="inp ltr" readonly value="{{ links|get:kind|last }}" style="flex:1;height:38px;border:1px solid var(--line-strong);border-radius:10px;padding:0 10px;background:var(--surface-2);color:var(--text);font:inherit;font-size:13px">
+      <button class="btn sec" type="button" onclick="navigator.clipboard.writeText(this.previousElementSibling.value).then(()=>DP.toast('اللينك اتنسخ')).catch(()=>this.previousElementSibling.select())">نسخ</button></div>
+    <dl class="dl" style="grid-template-columns:90px 1fr"><dt>بيملاه</dt><dd>{{ who }}</dd><dt>محتاج نظرة</dt><dd>{{ issues|ar }} رد</dd></dl>
+    <div><b style="font-size:13px">الأعمدة</b><div class="row" style="gap:6px;margin-top:8px">{% for c in columns %}<span class="tag ltr">{{ c }}</span>{% endfor %}</div></div>
+    <div class="banner info">{% icon 'shield' %}<div>كل خانة عليها قاعدة تحقق ورسالة خطأ بالعربي. التكرار (نفس الرقم القومي أو الإيميل) بيكشفه الموقع.</div></div>
+  </div></section>
+  <section class="card c8"><div class="card-h"><div><span class="k">الردود</span><h3>آخر الردود</h3></div></div><div class="card-b tbl-wrap">
+    <table class="tbl"><thead><tr><th>الرد</th><th>من</th><th>الشركة</th><th>الملخص</th><th>الحالة</th><th>الوقت</th></tr></thead><tbody>
+    {% for s in subs %}<tr><td class="ltr" style="font-size:12px">{{ s.response_id }}</td><td>{{ s.submitted_by }}</td><td>{% if s.provider %}<a href="/providers/{{ s.provider.code }}">{{ s.provider.code }}</a>{% endif %}</td>
+      <td style="font-size:13px">{{ s.summary }}{% if s.issue %}<div style="color:var(--danger);font-size:12px">{{ s.issue }}</div>{% endif %}</td>
+      <td>{% pill s.get_status_display s.status %}</td><td class="muted" style="font-size:12.5px">من {{ s.submitted_at|timesince|ar }}</td></tr>
+    {% empty %}<tr><td colspan="6"><div class="empty"><h4>لسه مفيش ردود</h4></div></td></tr>{% endfor %}
+    </tbody></table></div></section>
+</div>
+{% endblock %}

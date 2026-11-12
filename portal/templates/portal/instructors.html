@@ -1,0 +1,21 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}المحاضرين{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">المحاضرين</span><h1>المحاضرين</h1>
+  <p class="sub">كود المحاضر الرسمي <span class="code-badge">DEPI-NNNN-XXXX-XXXX-C</span>: آخر ٤ أرقام من الرقم القومي، و٨ رموز سرية بمفتاح الوزارة، وحرف تحقق. المفتاح مش متخزن في الموقع.</p></div>
+  <div class="acts"><a class="btn sec" href="/forms?kind=instructors">{% icon 'clipboard' %}فورم المحاضرين</a></div></div>
+<div class="kpis k5" style="margin-bottom:22px">
+  <div class="kpi"><span class="l">المحاضرين</span><div class="v num">{{ stats.total|ar }}</div></div>
+  <div class="kpi"><span class="l">ليهم كود رسمي</span><div class="v num">{{ stats.coded|ar }}</div></div>
+  <a class="kpi" href="?review=1"><span class="l">محتاجين مراجعة</span><div class="v num" style="color:var(--warning)">{{ stats.review|ar }}</div><div class="ft"><span class="s">رقم قومي غلط = مفيش كود</span></div></a>
+  <div class="kpi"><span class="l">معتمدين جزئيًا</span><div class="v num">{{ stats.partial|ar }}</div></div>
+  <div class="kpi"><span class="l">جم من الفورم</span><div class="v num">{{ stats.form|ar }}</div></div>
+</div>
+<form class="filters" hx-get="/instructors" hx-target="#tbl" hx-trigger="input changed delay:350ms from:input, change from:select" hx-push-url="true">
+  <input class="inp" name="q" value="{{ q }}" placeholder="اسم أو كود المحاضر…">
+  <select name="field"><option value="">كل المجالات</option>{% for f in fields %}<option value="{{ f }}" {% if f == field %}selected{% endif %}>{{ f }}</option>{% endfor %}</select>
+  <select name="review"><option value="">الكل</option><option value="1" {% if review %}selected{% endif %}>محتاجين مراجعة</option></select>
+  <select name="late"><option value="">أي تأخير</option><option value="1" {% if late %}selected{% endif %}>اتأخروا ٣ مرات+</option></select>
+</form>
+<section class="card" id="tbl">{% include "portal/partials/instructors_table.html" %}</section>
+{% endblock %}

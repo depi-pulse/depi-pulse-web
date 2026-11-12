@@ -1,0 +1,50 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}صندوق الواتساب{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">WhatsApp Business · n8n · الذكاء الاصطناعي</span><h1>صندوق الواتساب</h1>
+  <p class="sub">كل رسايل Wavz والشركات لرقم الوزارة بتوصل هنا مصنّفة بالذكاء الاصطناعي، والرد بيتبعت من هنا على الواتساب. الوزارة مش محتاجة تفتح الواتساب خالص.</p></div></div>
+{% if c %}
+<div class="inbox">
+  <nav class="conv-list" aria-label="المحادثات">
+    {% for x in convs %}
+    <a class="conv {% if x.pk == c.pk %}on{% endif %}" href="/inbox/{{ x.pk }}">
+      <span class="av" style="background:{% if x.sender_kind == 'wavz' %}#1e8a5a{% else %}{{ x.provider.color|default:'#2f55d4' }}{% endif %}">{% if x.provider %}{{ x.provider.code|slice:':2' }}{% else %}W{% endif %}</span>
+      <div style="min-width:0"><b>{{ x.display_name }}</b><small>{{ x.get_sender_kind_display }} · من {{ x.last_message_at|timesince|ar }}</small></div>
+      {% if x.unread and x.pk != c.pk %}<span class="badge">{{ x.unread|ar }}</span>{% endif %}
+    </a>{% endfor %}
+  </nav>
+  <div class="thread-wrap">
+    <div class="thread-h"><b style="font-family:var(--font-display)">{{ c.display_name }}</b><span class="masked ltr" style="font-size:12.5px">{{ c.phone|mask }}</span><span class="sp"></span>
+      {% if c.window_open %}<span class="window open">{% icon 'clock' %}النافذة مفتوحة · فاضل {{ c.window_left|ar }} ساعة</span>{% else %}<span class="window closed">{% icon 'lock' %}النافذة مقفولة · قوالب معتمدة بس</span>{% endif %}</div>
+    <div class="thread" id="thread">
+      {% for m in msgs %}{% include "portal/partials/message.html" %}{% endfor %}
+    </div>
+    <form class="composer" hx-post="/inbox/{{ c.pk }}/send" hx-target="#thread" hx-swap="beforeend" hx-on::after-request="if(event.detail.successful) this.reset()" x-data="{ tpl: '' }">
+      {% if c.window_open %}
+        <textarea name="text" placeholder="اكتب الرد… هيتبعت على الواتساب من رقم الوزارة" rows="2"></textarea>
+      {% else %}
+        <div class="banner warn">{% icon 'lock' %}<div>عدّت ٢٤ ساعة من آخر رسالة من الطرف التاني، فقواعد WhatsApp بتسمح بـ <b>قالب معتمد من Meta</b> بس.</div></div>
+      {% endif %}
+      <div class="row">
+        <select name="template" x-model="tpl" style="height:36px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-size:13px;padding:0 8px">
+          <option value="">{% if c.window_open %}أو اختار قالب…{% else %}اختار قالب معتمد…{% endif %}</option>
+          {% for key, name, body in templates %}<option value="{{ key }}">{{ name }}</option>{% endfor %}
+        </select>
+        <div class="row" style="gap:6px">{% for key, f in forms.items %}<button class="btn sec sm" type="button" hx-post="/inbox/{{ c.pk }}/send" hx-vals='{"form":"{{ key }}"}' hx-target="#thread" hx-swap="beforeend">{% icon 'link' %}{{ f.0 }}</button>{% endfor %}</div>
+        <span class="sp"></span><button class="btn pri" type="submit">{% icon 'send' %}ابعت</button>
+      </div>
+    </form>
+  </div>
+  <aside class="side-panel">
+    <div><h4>تحليل الذكاء الاصطناعي</h4>
+      {% for m in msgs %}{% if m.direction == 'in' and m.ai_summary %}<div class="ai-card" style="margin-bottom:8px"><b>{{ m.ai_summary }}</b><div class="row" style="gap:6px;margin-top:6px">{% if m.ai_priority %}{% pill m.ai_priority|label m.ai_priority %}{% endif %}{% if m.ai_type %}<span class="tag">{{ m.ai_type|label }}</span>{% endif %}<span class="tag">{{ m.ai_intent|label }}</span></div></div>{% endif %}{% endfor %}
+    </div>
+    <div><h4>التذاكر المرتبطة</h4>
+      {% for t in tickets %}<a class="row" href="/tickets/{{ t.code }}" style="padding:6px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit"><span class="ltr" style="font-size:12px">{{ t.code }}</span><span class="sp"></span>{% pill t.get_status_display t.status %}</a>{% empty %}<p class="muted" style="font-size:13px;margin:0">مفيش تذاكر.</p>{% endfor %}
+    </div>
+    <div><h4>المرسل</h4><dl class="dl" style="grid-template-columns:70px 1fr;font-size:13px"><dt>النوع</dt><dd>{{ c.get_sender_kind_display }}</dd>{% if c.provider %}<dt>الشركة</dt><dd><a href="/providers/{{ c.provider.code }}">{{ c.provider.name }}</a></dd>{% endif %}</dl></div>
+  </aside>
+</div>
+{% else %}<div class="card"><div class="empty"><h4>لسه مفيش رسايل</h4><p>أول ما Wavz أو شركة تبعت رسالة لرقم الوزارة هتظهر هنا.</p></div></div>{% endif %}
+{% endblock %}
+{% block scripts %}<script>addEventListener('DOMContentLoaded', () => { const t = document.getElementById('thread'); if (t) t.scrollTop = t.scrollHeight; });</script>{% endblock %}

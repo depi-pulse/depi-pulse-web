@@ -1,0 +1,31 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}الشكاوى والطلبات{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">التذاكر من الواتساب</span><h1>الشكاوى والطلبات</h1>
+  <p class="sub">كل تذكرة اتفتحت أوتوماتيك من رسالة واتساب بعد ما الذكاء الاصطناعي صنّفها. أي تغيير في الحالة بيتبعت لصاحب الرسالة على الواتساب.</p></div>
+  <div class="acts"><a class="btn pri" href="/inbox">{% icon 'whatsapp' %}صندوق الواتساب</a></div></div>
+<div class="grid" style="margin-bottom:22px">
+  <div class="kpis c8" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+    <div class="kpi"><span class="l">مفتوحة</span><div class="v num">{{ stats.open|ar }}</div></div>
+    <div class="kpi"><span class="l">عدّت الـ SLA</span><div class="v num" style="color:var(--danger)">{{ stats.breached|ar }}</div></div>
+    <div class="kpi"><span class="l">اتحلت في الوقت</span><div class="v num">{{ stats.sla|ar }}<small>٪</small></div></div>
+    <div class="kpi"><span class="l">كل التذاكر</span><div class="v num">{{ stats.total|ar }}</div></div>
+  </div>
+  <section class="card c4"><div class="card-b" style="padding:8px"><div class="chart sm" style="height:150px" data-chart="c-types"></div></div></section>
+</div>
+<div class="kanban">
+{% for key, label, items, count in cols %}
+  <div class="col"><div class="col-h row" style="padding:4px 6px 10px"><b>{{ label }}</b><span class="pill">{{ count|ar }}</span></div>
+    {% for t in items %}
+    <a class="tk" href="/tickets/{{ t.code }}" style="text-decoration:none;color:inherit;display:flex;gap:10px">
+      <span class="prio" style="background:var(--{% if t.priority == 'critical' or t.priority == 'urgent' %}danger{% elif t.priority == 'high' %}warning{% else %}line-strong{% endif %})"></span>
+      <div style="min-width:0;flex:1"><span class="num-t">{{ t.code }}</span><b>{{ t.title }}</b>
+        <div class="meta">{% pill t.get_priority_display t.priority %}<span class="tag">{{ t.get_type_display }}</span>
+          {% if t.status != 'resolved' %}{% if t.breached %}<span class="sla bad">{% icon 'clock' %}عدّت</span>{% elif t.sla_used > 70 %}<span class="sla warn">{% icon 'clock' %}{{ t.sla_used|ar }}٪</span>{% else %}<span class="sla ok">{% icon 'clock' %}{{ t.sla_used|ar }}٪</span>{% endif %}{% endif %}
+        </div></div></a>
+    {% endfor %}
+  </div>
+{% endfor %}
+</div>
+{{ chart|json_script:"c-types" }}
+{% endblock %}

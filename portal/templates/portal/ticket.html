@@ -1,0 +1,24 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}{{ t.code }}{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow"><a href="/tickets" style="color:inherit">الشكاوى والطلبات</a> · <span class="ltr">{{ t.code }}</span></span>
+  <h1>{{ t.title }}</h1></div>
+  <div class="acts">{% pill t.get_priority_display t.priority %}{% pill t.get_status_display t.status %}</div></div>
+<div class="grid">
+  <section class="card c7"><div class="card-h"><div><span class="k">من الواتساب</span><h3>المحادثة</h3></div>{% if t.conversation %}<div class="tools"><a class="btn sec sm" href="/inbox/{{ t.conversation.pk }}">افتح في الصندوق</a></div>{% endif %}</div>
+    <div class="card-b"><div class="thread" style="border-radius:12px;max-height:440px">{% for m in msgs %}{% include "portal/partials/message.html" %}{% empty %}<div class="bubble in">{{ t.summary }}</div>{% endfor %}</div></div></section>
+  <section class="card c5"><div class="card-h"><div><span class="k">التذكرة</span><h3>التفاصيل والـ SLA</h3></div></div><div class="card-b stack" style="gap:16px">
+    <dl class="dl">
+      <dt>النوع</dt><dd>{{ t.get_type_display }}</dd><dt>التصنيف</dt><dd>{{ t.category }}</dd>
+      <dt>المجموعة</dt><dd>{% if t.group %}<a class="cart" href="/groups/{{ t.group.code }}">{{ t.group.code }}</a>{% else %}—{% endif %}</dd>
+      <dt>اتفتحت</dt><dd>{{ t.created_at|date:"j F · H:i"|ar }}</dd><dt>آخر ميعاد للحل</dt><dd>{{ t.due_at|date:"j F · H:i"|ar }}</dd>
+    </dl>
+    <div><div class="row" style="justify-content:space-between;font-size:13px"><span>الوقت المستخدم من الـ SLA</span><b>{{ t.sla_used|ar }}٪</b></div>
+      <div class="progress" style="margin-top:6px"><i style="width:{{ t.sla_used }}%;{% if t.breached %}background:var(--danger){% endif %}"></i></div></div>
+    <form method="post" action="/tickets/{{ t.code }}/status" class="row">{% csrf_token %}
+      <select name="status" style="height:38px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;padding:0 10px;flex:1">{% for k, l in statuses %}<option value="{{ k }}" {% if k == t.status %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+      <button class="btn pri" type="submit">غيّر الحالة وبلّغ المرسل</button></form>
+    <div class="banner info">{% icon 'info' %}<div>تغيير الحالة بيبعت رسالة للمرسل على الواتساب بقالب «تحديث حالة شكوى»، والملاحظات الداخلية عمرها ما بتتبعت.</div></div>
+  </div></section>
+</div>
+{% endblock %}

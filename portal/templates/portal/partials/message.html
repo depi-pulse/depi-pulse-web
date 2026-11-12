@@ -1,0 +1,10 @@
+{% load depi %}<div class="bubble {{ m.direction }}{% if fresh %} fresh{% endif %}">
+  <div>{{ m.text|urlize }}</div>
+  {% if m.direction == 'in' and m.ai_summary %}<div class="ai">{% icon 'sparkle' %} <span class="muted" style="font-size:12px">{{ m.ai_summary }}</span></div>{% endif %}
+  <div class="meta">
+    {% if m.auto_reply %}<span class="tag" style="font-size:11px">{% icon 'robot' %}رد أوتوماتيك</span>{% endif %}
+    {% if m.template %}<span class="tag" style="font-size:11px">قالب معتمد</span>{% endif %}
+    <span>{{ m.created_at|date:"H:i"|ar }}</span>
+    {% if m.direction == 'out' %}<span title="{{ m.get_delivery_display }}">{% if m.delivery == 'read' %}✓✓{% elif m.delivery == 'delivered' %}✓✓{% else %}✓{% endif %}</span>{% endif %}
+  </div>
+</div>

@@ -1,0 +1,27 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow"><a href="/providers" style="color:inherit">الشركات</a> · {{ p.get_kind_display }}</span>
+  <h1 class="row"><span class="logo-tile" style="background:{{ p.color }};width:46px;height:46px;font-size:14px">{{ p.code }}</span>{{ p.name }}</h1></div>
+  <div class="acts"><a class="btn sec" href="/inbox">{% icon 'whatsapp' %}محادثة الواتساب</a></div></div>
+<div class="kpis k5" style="margin-bottom:22px">
+  <div class="kpi"><span class="l">المجموعات</span><div class="v num">{{ n_groups|ar }}</div></div>
+  <div class="kpi"><span class="l">الطلبة</span><div class="v num">{{ students|ar }}</div></div>
+  <div class="kpi"><span class="l">المحاضرين</span><div class="v num">{{ n_instructors|ar }}</div></div>
+  <div class="kpi"><span class="l">محاضرات المحاضر اتأخر فيها</span><div class="v num">{{ late|ar }}</div><div class="ft"><span class="s">من {{ lec_count|ar }} محاضرة</span></div></div>
+  <div class="kpi"><span class="l">محاضرات من غير تقرير حضور</span><div class="v num" {% if no_report %}style="color:var(--danger)"{% endif %}>{{ no_report|ar }}</div></div>
+</div>
+<div class="grid">
+  <section class="card c5"><div class="card-h"><div><span class="k">المسارات</span><p class="ins">المجموعات حسب المسار</p></div></div><div class="card-b"><div class="chart" data-chart="c-tr"></div></div></section>
+  <section class="card c7"><div class="card-h"><div><span class="k">المجموعات</span><h3>أول ٦٠ مجموعة</h3></div></div><div class="card-b tbl-wrap" style="max-height:420px">
+    <table class="tbl"><thead><tr><th>الكود</th><th>المسار</th><th>المحافظة</th><th>الامتلاء</th></tr></thead><tbody>
+    {% for g in groups %}<tr><td><a class="cart" href="/groups/{{ g.code }}">{{ g.code }}</a></td><td>{{ g.track.name_ar }}</td><td>{{ g.governorate }}</td>
+      <td><div class="cap-bar"><div class="t"><i style="width:{{ g.n_students|percent_of:g.capacity }}%;background:{% if g.n_students > g.capacity %}var(--danger){% else %}var(--primary){% endif %}"></i></div><span>{{ g.n_students|ar }}/{{ g.capacity|ar }}</span></div></td></tr>{% endfor %}
+    </tbody></table></div></section>
+  <section class="card c12"><div class="card-h"><div><span class="k">المحاضرين</span><h3>محاضرين الشركة</h3></div></div><div class="card-b tbl-wrap">
+    <table class="tbl"><thead><tr><th>المحاضر</th><th>الكود</th><th>المجال</th><th>الاعتماد</th></tr></thead><tbody>
+    {% for i in instructors %}<tr><td><a href="/instructors/{{ i.pk }}">{{ i.name_ar }}</a></td><td>{% if i.code %}<span class="code-badge">{{ i.code }}</span>{% else %}<span class="code-badge none">مفيش كود</span>{% endif %}</td><td class="ltr">{{ i.fields }}</td><td>{% pill i.get_approval_display i.approval %}</td></tr>{% endfor %}
+    </tbody></table></div></section>
+</div>
+{{ chart|json_script:"c-tr" }}
+{% endblock %}

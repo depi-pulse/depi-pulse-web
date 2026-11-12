@@ -1,0 +1,36 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}الإعدادات والتكاملات{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">الإعدادات</span><h1>الإعدادات والتكاملات</h1>
+  <p class="sub">القواعد هنا إعدادات متخزنة في قاعدة البيانات، وأي تعديل بيبقى إصدار جديد بتاريخ سريان، من غير ما الكود يتغير.</p></div></div>
+<div class="grid">
+  <section class="card c6"><div class="card-h"><div><span class="k">سياسة الحضور (الإصدار ١)</span><h3>قواعد الطالب والمحاضر</h3></div></div><div class="card-b">
+    <dl class="dl" style="grid-template-columns:1fr auto">
+      <dt>حاضر</dt><dd>{{ rule.present_min_percent|ar }}٪ من المحاضرة أو أكتر</dd><dt>حضور جزئي (نص غياب)</dt><dd>من {{ rule.partial_min_percent|ar }}٪</dd>
+      <dt>علامة متأخر / خرج بدري</dt><dd>{{ rule.late_after_minutes|ar }} د / {{ rule.left_early_minutes|ar }} د</dd><dt>العذر يتقدم خلال</dt><dd>{{ rule.excuse_deadline_hours|ar }} ساعة</dd>
+      <dt>إنذار أول / تاني / توصية بالفصل</dt><dd>{{ rule.warning1_percent|ar }}٪ / {{ rule.warning2_percent|ar }}٪ / فوق {{ rule.dismissal_percent|ar }}٪</dd>
+      <dt>المحاضر متأخر</dt><dd>بعد {{ rule.instructor_late_minutes|ar }} د</dd><dt>المحاضرة متعملتش</dt><dd>{{ rule.not_held_minutes|ar }} د تأخير</dd>
+      <dt>أقل مدة فعلية</dt><dd>{{ rule.min_duration_percent|ar }}٪</dd><dt>التعويض خلال</dt><dd>{{ rule.makeup_within_days|ar }} أيام</dd>
+    </dl></div></section>
+  <section class="card c6"><div class="card-h"><div><span class="k">الشكاوى</span><h3>الوقت المسموح للحل (SLA)</h3></div></div><div class="card-b">
+    <dl class="dl" style="grid-template-columns:1fr auto">{% for name, text in sla %}<dt>{{ name }}</dt><dd>{{ text }}</dd>{% endfor %}</dl>
+    <h4 style="margin:18px 0 8px;font-family:var(--font-display)">قوالب الواتساب المعتمدة من Meta</h4>
+    {% for key, name, body in templates %}<div style="padding:8px 0;border-bottom:1px solid var(--line)"><b style="font-size:13.5px">{{ name }}</b><div class="muted" style="font-size:12.5px">{{ body }}</div></div>{% endfor %}
+  </div></section>
+
+  <section class="card c12"><div class="card-h"><div><span class="k">نموذج الذكاء الاصطناعي</span><p class="ins">خياران جاهزين، والتبديل بينهم إعداد واحد في n8n</p></div></div><div class="card-b">
+    <div class="grid">
+      <div class="option-card c6"><span class="pill info"><i></i>الخيار (أ) · سحابي مدفوع</span><h3>Claude من Anthropic</h3><div class="price">Opus 5.5 <span class="muted" style="font-size:14px">أو Haiku 5.5 للاقتصاد</span></div>
+        <ul><li>دقة ممتازة في العامية المصري والتصنيف</li><li>تكلفة تقريبية: Opus ≈ ٨٠$ / Haiku ≈ ٢$ في الشهر (٣٠٠ رسالة يوميًا)</li><li>النص بيخرج لخدمة خارجية بعد إخفاء الأرقام الحساسة</li><li>مفيش أي احتياجات على سيرفر الوزارة</li></ul></div>
+      <div class="option-card c6"><span class="pill"><i></i>الخيار (ب) · محلي مجاني</span><h3>نموذج مفتوح المصدر على Ollama</h3><div class="price">Qwen <span class="muted" style="font-size:14px">أو ما يماثله</span></div>
+        <ul><li>دقة متوسطة في العامية المصري</li><li>مفيش اشتراك شهري</li><li>البيانات مبتخرجش من سيرفر الوزارة</li><li>محتاج كارت شاشة (GPU) قوي في السيرفر</li></ul></div>
+    </div></div></section>
+
+  <section class="card c12" id="teams"><div class="card-h"><div><span class="k">التكاملات</span><h3>ربط Teams لكل شركة · الواتساب · الفورمز</h3></div></div><div class="card-b tbl-wrap">
+    <table class="tbl"><thead><tr><th>الشركة</th><th>النوع</th><th>ربط Teams (Microsoft Graph)</th><th>رقم الواتساب المعروف</th></tr></thead><tbody>
+    {% for p in providers %}<tr><td><a href="/providers/{{ p.code }}">{{ p.code }} · {{ p.name }}</a></td><td>{{ p.get_kind_display }}</td>
+      <td>{% if p.teams_status == 'active' %}{% pill 'شغال' 'ok' %}{% elif p.teams_status == 'failing' %}{% pill 'فيه مشكلة في الموافقة' 'err' %}{% else %}{% pill 'مستني موافقة IT الشركة' 'wait' %}{% endif %}</td>
+      <td><span class="masked">{{ p.whatsapp_number|mask }}</span></td></tr>{% endfor %}
+    </tbody></table></div></section>
+</div>
+{% endblock %}

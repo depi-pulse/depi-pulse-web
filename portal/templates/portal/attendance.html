@@ -1,0 +1,43 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}الحضور{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">الحضور من Microsoft Teams</span><h1>الحضور</h1>
+  <p class="sub">بعد كل محاضرة بـ ١٥ دقيقة، الموقع بيسحب تقرير الحضور أوتوماتيك من Teams (Microsoft Graph، صلاحية قراءة بس)، ويطابق الطلبة بالإيميل، ويطبّق سياسة الحضور.</p></div></div>
+<div class="kpis" style="grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:22px">
+  <div class="kpi"><span class="l">محاضرات (آخر أسبوعين)</span><div class="v num">{{ stats.lectures|ar }}</div></div>
+  <div class="kpi"><span class="l">نسبة الحضور</span><div class="v num">{{ stats.rate|ar }}<small>٪</small></div></div>
+  <a class="kpi" href="?status=not_held"><span class="l">متعملتش (تعويض)</span><div class="v num" style="color:var(--danger)">{{ stats.not_held|ar }}</div></a>
+  <div class="kpi"><span class="l">المحاضر اتأخر +١٠ د</span><div class="v num">{{ stats.late|ar }}</div></div>
+  <a class="kpi" href="?report=0"><span class="l">تقرير ناقص</span><div class="v num" style="color:var(--warning)">{{ stats.no_report|ar }}</div></a>
+  <div class="kpi"><span class="l">مشاركين غير مطابقين</span><div class="v num">{{ stats.unmatched|ar }}</div></div>
+</div>
+<div class="grid">
+  <section class="card c8"><div class="card-h"><div><span class="k">كل يوم</span><p class="ins">نسبة الحضور اليومية</p></div></div><div class="card-b"><div class="chart sm" data-chart="c-att"></div></div></section>
+  <section class="card c4"><div class="card-h"><div><span class="k">سياسة الحضور (الإصدار ١)</span><h3>الوزارة بتلزم بيها كل الشركات</h3></div></div><div class="card-b">
+    <dl class="dl" style="grid-template-columns:1fr auto">
+      <dt>حاضر</dt><dd>{{ rule.present_min_percent|ar }}٪ أو أكتر</dd>
+      <dt>حضور جزئي (= نص غياب)</dt><dd>{{ rule.partial_min_percent|ar }}–{{ rule.present_min_percent|ar }}٪</dd>
+      <dt>متأخر</dt><dd>بعد {{ rule.late_after_minutes|ar }} د</dd>
+      <dt>إنذار أول / تاني</dt><dd>{{ rule.warning1_percent|ar }}٪ / {{ rule.warning2_percent|ar }}٪</dd>
+      <dt>توصية بالفصل</dt><dd>فوق {{ rule.dismissal_percent|ar }}٪</dd>
+      <dt>المحاضر متأخر</dt><dd>بعد {{ rule.instructor_late_minutes|ar }} د</dd>
+      <dt>المحاضرة متعملتش</dt><dd>{{ rule.not_held_minutes|ar }} د تأخير</dd>
+      <dt>التعويض</dt><dd>خلال {{ rule.makeup_within_days|ar }} أيام</dd>
+    </dl></div></section>
+  <section class="card c12">
+    <div class="card-h"><div><span class="k">المحاضرات</span><h3>آخر أسبوعين</h3></div>
+      <div class="tools seg"><a class="btn ghost sm {% if not comp %}on{% endif %}" href="?">الكل</a><a class="btn ghost sm" href="?component=technical">تقني</a><a class="btn ghost sm" href="?component=soft">مهارات</a><a class="btn ghost sm" href="?component=english">إنجليزي</a></div></div>
+    <div class="card-b tbl-wrap"><table class="tbl"><thead><tr><th>اليوم</th><th>المجموعة</th><th>النوع</th><th>المحاضر</th><th>تأخير المحاضر</th><th>المدة الفعلية</th><th>الحضور</th><th>الحالة</th></tr></thead><tbody>
+    {% for l in page %}<tr>
+      <td><a href="/attendance/{{ l.pk }}">{{ l.starts_at|date:"D j/n · H:i"|ar }}</a></td><td><a class="cart" href="/groups/{{ l.group.code }}">{{ l.group.code }}</a></td><td>{{ l.get_component_display }}</td>
+      <td>{% if l.instructor %}<a href="/instructors/{{ l.instructor.pk }}">{{ l.instructor }}</a>{% else %}—{% endif %}</td>
+      <td>{% if l.instructor_late_min >= rule.not_held_minutes %}<span class="sla bad">{{ l.instructor_late_min|ar }} د</span>{% elif l.instructor_late_min > rule.instructor_late_minutes %}<span class="sla warn">{{ l.instructor_late_min|ar }} د</span>{% else %}<span class="sla ok">{{ l.instructor_late_min|ar }} د</span>{% endif %}</td>
+      <td>{{ l.actual_duration_min|ar }} من {{ l.duration_min|ar }} د</td>
+      <td>{% if l.status == 'cancelled' %}—{% elif l.has_report %}<b class="num">{{ l.attendance_rate|ar }}٪</b> <span class="muted" style="font-size:12px">({{ l.present|ar }}/{{ l.partial|ar }}/{{ l.absent|ar }})</span>{% else %}{% pill 'تقرير ناقص' 'err' %}{% endif %}</td>
+      <td>{% pill l.get_status_display l.status %}</td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="pagi"><span>صفحة {{ page.number|ar }} من {{ page.paginator.num_pages|ar }}</span><span class="row">{% if page.has_previous %}<a href="?status={{ status }}&report={{ report }}&component={{ comp }}&page={{ page.previous_page_number }}">السابقة</a>{% endif %}{% if page.has_next %}<a href="?status={{ status }}&report={{ report }}&component={{ comp }}&page={{ page.next_page_number }}">التالية</a>{% endif %}</span></div>
+  </section>
+</div>
+{{ chart|json_script:"c-att" }}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% load static depi %}<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تسجيل الدخول · DEPI Pulse</title>
+<link rel="stylesheet" href="{% static 'portal/tokens.css' %}">
+<link rel="stylesheet" href="{% static 'portal/app.css' %}">
+<link rel="stylesheet" href="{% static 'portal/extra.css' %}">
+<script>try { const t = localStorage.getItem('dp-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+</head>
+<body>
+<div class="login-wrap">
+  <section class="login-art">
+    <div class="row">{% logo 40 %}<b style="font-family:var(--font-display);font-size:20px">DEPI Pulse</b></div>
+    <div>
+      <h1>نبض رواد<br>مصر الرقمية.</h1>
+      <p>مكان واحد تتابع منه الوزارة الدورة كلها: المتقدمين والطلبة والمجموعات والشركات والمحاضرين والحضور ورسايل الواتساب ومشاريع التخرج.</p>
+    </div>
+    <svg class="river" viewBox="0 0 800 220" aria-hidden="true"><path d="M800 40 C560 40 520 120 300 110 L0 100" fill="none" stroke="#8fa6f2" stroke-width="22" stroke-linecap="round"/><path d="M800 40 C560 40 520 170 300 190 L60 200" fill="none" stroke="#8fa6f2" stroke-width="12" stroke-linecap="round" opacity=".6"/><path d="M0 100 L300 110" stroke="#dda845" stroke-width="22" stroke-linecap="round"/></svg>
+    <small style="color:#8494c0;position:relative">وزارة الاتصالات وتكنولوجيا المعلومات</small>
+  </section>
+  <section class="login-box">
+    <form class="login-card" method="post">{% csrf_token %}
+      <span class="eyebrow">دخول الوزارة</span>
+      <h2>أهلًا بيك</h2>
+      <p class="muted" style="margin:0">الدخول بحساب Microsoft بتاع الوزارة (Microsoft Entra ID). مفيش كلمة سر بتتكتب هنا.</p>
+      <button class="ms-btn" type="submit">
+        <svg width="20" height="20" viewBox="0 0 21 21" aria-hidden="true"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+        الدخول بحساب Microsoft
+      </button>
+      <div class="banner info">{% icon 'info' %}<div>ده <b>نموذج أولي</b>: الزرار بيدخّلك على طول، وكل البيانات اللي جوه <b>وهمية</b> للعرض.</div></div>
+    </form>
+  </section>
+</div>
+</body>
+</html>

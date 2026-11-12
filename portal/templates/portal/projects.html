@@ -1,0 +1,27 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}مشاريع التخرج{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">فورم مشروع التخرج + فورم تقييم المشروع</span><h1>مشاريع التخرج</h1>
+  <p class="sub">قائد الفريق بيسجّل الفريق، والمحاضر أو الشركة بيقيّم: العرض والديمو + التسليم النهائي، والإجمالي بيتحسب أوتوماتيك، ومعاه لينك تسجيل المناقشة.</p></div></div>
+<div class="kpis k5" style="margin-bottom:22px">
+  <div class="kpi"><span class="l">الفرق</span><div class="v num">{{ stats.teams|ar }}</div></div>
+  <div class="kpi"><span class="l">الأعضاء</span><div class="v num">{{ stats.members|ar }}</div></div>
+  <div class="kpi"><span class="l">اتقيّمت</span><div class="v num">{{ stats.assessed|ar }}</div><div class="ft"><span class="s">من {{ stats.teams|ar }}</span></div></div>
+  <div class="kpi"><span class="l">متوسط الإجمالي</span><div class="v num">{{ stats.avg|ar:1 }}</div></div>
+  <div class="kpi"><span class="l">متوسط العرض / التسليم</span><div class="v num" style="font-size:30px">{{ stats.p|ar:1 }} / {{ stats.f|ar:1 }}</div></div>
+</div>
+<div class="grid">
+  <section class="card c4"><div class="card-h"><div><span class="k">توزيع الدرجات</span><p class="ins">الإجمالي</p></div></div><div class="card-b"><div class="chart sm" data-chart="c-sc"></div></div></section>
+  <section class="card c8"><div class="card-h"><div><span class="k">الفرق</span><h3>كل الفرق</h3></div>
+    <div class="tools"><form method="get"><select name="track" onchange="this.form.submit()" style="height:32px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:13px"><option value="">كل المسارات</option>{% for t in tracks %}<option value="{{ t.code }}" {% if t.code == track %}selected{% endif %}>{{ t.name_ar }}</option>{% endfor %}</select></form></div></div>
+    <div class="card-b tbl-wrap"><table class="tbl"><thead><tr><th>المجموعة</th><th>الفكرة</th><th>القائد</th><th>الأعضاء</th><th>GitHub</th><th>العرض</th><th>التسليم</th><th>الإجمالي</th><th>التسجيل</th></tr></thead><tbody>
+    {% for t in page %}<tr><td><a class="cart" href="/groups/{{ t.group.code }}">{{ t.group.code }}</a></td><td>{{ t.idea }}</td><td>{{ t.leader_name }}</td><td class="n">{{ t.members|ar }}</td>
+      <td><a href="{{ t.github }}" target="_blank" rel="noopener" title="{{ t.github }}">{% icon 'github' %}</a></td>
+      {% if t.assessment %}<td class="n">{{ t.assessment.presentation_demo|ar:1 }}</td><td class="n">{{ t.assessment.final_submission|ar:1 }}</td><td><b class="score">{{ t.assessment.total|ar:1 }}</b></td><td><a href="{{ t.assessment.recording_link }}" target="_blank" rel="noopener">{% icon 'play' %}</a></td>
+      {% else %}<td colspan="4"><span class="muted">لسه متقيّمش</span></td>{% endif %}</tr>{% endfor %}
+    </tbody></table></div>
+    <div class="pagi"><span>صفحة {{ page.number|ar }} من {{ page.paginator.num_pages|ar }}</span><span class="row">{% if page.has_previous %}<a href="?track={{ track }}&page={{ page.previous_page_number }}">السابقة</a>{% endif %}{% if page.has_next %}<a href="?track={{ track }}&page={{ page.next_page_number }}">التالية</a>{% endif %}</span></div>
+  </section>
+</div>
+{{ chart|json_script:"c-sc" }}
+{% endblock %}

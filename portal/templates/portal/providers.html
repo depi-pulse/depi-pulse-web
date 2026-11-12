@@ -1,0 +1,22 @@
+{% extends "portal/base.html" %}{% load depi %}
+{% block title %}الشركات{% endblock %}
+{% block content %}
+<div class="ph"><div><span class="eyebrow">شركات التدريب</span><h1>الشركات</h1>
+  <p class="sub">كل شركة ليها كود رسمي من ٣ حروف. شركات المهارات الشخصية والإنجليزي خدت أكواد جديدة، والتحالفات بتجمع شركتين بيقدّموا لنفس المجموعة.</p></div></div>
+<div class="tabs">{% for k, l in kinds %}<a href="?kind={{ k }}" class="{% if k == kind %}on{% endif %}">{{ l }}</a>{% endfor %}</div>
+<div class="grid">
+{% for p in providers %}
+  <a class="card c4" href="/providers/{{ p.code }}" style="text-decoration:none;color:inherit">
+    <div class="card-b stack" style="gap:12px">
+      <div class="row"><span class="logo-tile" style="background:{{ p.color }};width:48px;height:48px;font-size:14px">{{ p.code }}</span>
+        <div><b style="font-size:17px;font-family:var(--font-display)">{{ p.name }}</b><div class="muted" style="font-size:13px">{{ p.get_kind_display }}</div></div>
+        <span class="sp"></span><span class="score">{{ p.rating|ar:1 }} ★</span></div>
+      <div class="row" style="gap:18px;font-size:13.5px">
+        <span><b class="num">{{ p.n_groups|ar }}</b> مجموعة</span><span><b class="num">{{ p.n_instructors|ar }}</b> محاضر</span>
+        <span class="sp"></span>{% if p.kind != 'consortium' %}{% if p.teams_status == 'active' %}{% pill 'Teams شغال' 'ok' %}{% elif p.teams_status == 'failing' %}{% pill 'Teams فيه مشكلة' 'err' %}{% else %}{% pill 'مستني موافقة IT' 'wait' %}{% endif %}{% endif %}
+      </div>
+    </div>
+  </a>
+{% endfor %}
+</div>
+{% endblock %}

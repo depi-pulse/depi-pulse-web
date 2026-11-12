@@ -1,0 +1,7 @@
+# Prototype: one container on SQLite with fake data.
+# The production setup adds PostgreSQL 18, Redis, Celery worker/beat, n8n and an HTTPS reverse proxy.
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
