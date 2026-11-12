@@ -1,3 +1,13 @@
+---
+title: DEPI Pulse
+emoji: 📊
+colorFrom: blue
+colorTo: yellow
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # DEPI Pulse: Python prototype
 
 The monitoring portal of the Ministry of Communications and IT (MCIT) for the **Digital Egypt Pioneers Initiative (DEPI)**, rebuilt in **Python / Django**.

@@ -16,12 +16,12 @@ def _env_list(name, default=""):
     return [x.strip() for x in os.environ.get(name, default).split(",") if x.strip()]
 
 
-ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.app.github.dev,.onrender.com,.up.railway.app")
+ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.app.github.dev,.onrender.com,.up.railway.app,.hf.space")
 CSRF_TRUSTED_ORIGINS = _env_list(
-    "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.app.github.dev,https://*.onrender.com,https://*.up.railway.app")
+    "DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.app.github.dev,https://*.onrender.com,https://*.up.railway.app,https://*.hf.space")
 
-# Render / Railway give the public host name in an env var: trust it automatically.
-for _var in ("RENDER_EXTERNAL_HOSTNAME", "RAILWAY_PUBLIC_DOMAIN"):
+# Render / Railway / Hugging Face give the public host name in an env var: trust it automatically.
+for _var in ("RENDER_EXTERNAL_HOSTNAME", "RAILWAY_PUBLIC_DOMAIN", "SPACE_HOST"):
     if os.environ.get(_var):
         ALLOWED_HOSTS.append(os.environ[_var])
         CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ[_var]}")
@@ -30,6 +30,12 @@ if not DEBUG:  # behind the host's HTTPS proxy
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# Hugging Face shows the app inside an iframe on huggingface.co: allow that and cross-site cookies.
+ON_HF_SPACE = bool(os.environ.get("SPACE_ID"))
+if ON_HF_SPACE:
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
@@ -51,6 +57,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "portal.middleware.DemoLoginRequired",
 ]
+if ON_HF_SPACE:
+    MIDDLEWARE.remove("django.middleware.clickjacking.XFrameOptionsMiddleware")
 
 ROOT_URLCONF = "config.urls"
 
@@ -83,7 +91,8 @@ if os.environ.get("POSTGRES_DB"):
         }
     }
 else:
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3",
+                             "NAME": os.environ.get("SQLITE_PATH", BASE_DIR / "db.sqlite3")}}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
